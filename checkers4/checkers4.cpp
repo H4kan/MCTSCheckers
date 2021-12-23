@@ -208,10 +208,30 @@ void markAvailableFields(RectangleShape* fieldShapes, bool* available)
 
 void removePawn(int row, int col, int* rows, int* cols, int* fields, CircleShape* pawns)
 {
-    rows[row] = -1;
-    rows[col] = -1;
-    pawns[fields[row * BOARD_SIZE + col]].setRadius(0);
+    int targetIdx = fields[row * BOARD_SIZE + col];
+    rows[targetIdx] = -1;
+    cols[targetIdx] = -1;
+    pawns[targetIdx].setRadius(0);
     fields[row * BOARD_SIZE + col] = -1;
+}
+
+void handlePawnClick(int i, int* rows, int* cols, int* fields, RectangleShape* fieldShapes, bool* available, 
+    int& selectedPawnIdx, bool& performedOperation, bool isThereKill, bool* pawnHasKill)
+{
+    clearAvailableFields(available);
+    if (!isThereKill)
+        setAvailableFields(rows[i], cols[i], i < (PAWN_ROWS* BOARD_SIZE / 2),
+            available, fields);
+    if (pawnHasKill[i])
+        setAvailableKills(fields, rows[i], cols[i], i < (PAWN_ROWS* BOARD_SIZE / 2), available);
+    markAvailableFields(fieldShapes, available);
+    selectedPawnIdx = i;
+    performedOperation = true;
+}
+
+void markQueen(CircleShape* pawns, int idx)
+{
+    pawns[idx].setOutlineColor(Color::Yellow);
 }
 
 int main()
@@ -224,13 +244,16 @@ int main()
     int* cols = new int[PAWN_ROWS * BOARD_SIZE];
     bool* pawnHasKill = new bool[PAWN_ROWS * BOARD_SIZE];
     bool* available = new bool[BOARD_SIZE * BOARD_SIZE];
+    bool* isQueen = new bool[PAWN_ROWS * BOARD_SIZE];
     int selectedPawnIdx = -1;
     bool performedOperation = false;
-  
+    bool blackTurn = false;
     setupFields(fieldShapes, fields);
     setupPawns(pawns, fields, rows, cols);
+    
     window.setFramerateLimit(25);
     Event event;
+
     bool isThereKill = false;
     while (true)
     {
@@ -247,22 +270,24 @@ int main()
             recolorFields(fieldShapes);
             Vector2f mousePosition = (Vector2f)Mouse::getPosition(window);
 
-            for (int i = 0; i < PAWN_ROWS * BOARD_SIZE; i++)
-            {
-                if (isClickInShape(pawns[i], mousePosition))
+            if (!blackTurn)
+                for (int i = 0; i < PAWN_ROWS * BOARD_SIZE / 2; i++)
                 {
-                    clearAvailableFields(available);
-                    if (!isThereKill)
-                        setAvailableFields(rows[i], cols[i], i < (PAWN_ROWS* BOARD_SIZE / 2), 
-                            available, fields);
-                    if (pawnHasKill[i])
-                        setAvailableKills(fields, rows[i], cols[i], i < (PAWN_ROWS* BOARD_SIZE / 2), available);
-                    markAvailableFields(fieldShapes, available);
-                    selectedPawnIdx = i;
-                    performedOperation = true;
-                    break;
+                    if (isClickInShape(pawns[i], mousePosition))
+                    {
+                        handlePawnClick(i, rows, cols, fields, fieldShapes, available, selectedPawnIdx, performedOperation, isThereKill, pawnHasKill);
+                        break;
+                    }
                 }
-            }
+            else
+                for (int i = PAWN_ROWS * BOARD_SIZE / 2; i < PAWN_ROWS * BOARD_SIZE; i++)
+                {
+                    if (isClickInShape(pawns[i], mousePosition))
+                    {
+                        handlePawnClick(i, rows, cols, fields, fieldShapes, available, selectedPawnIdx, performedOperation, isThereKill, pawnHasKill);
+                        break;
+                    }
+                }
             
             if (!performedOperation && selectedPawnIdx >= 0)
             {
@@ -271,23 +296,44 @@ int main()
                     if (available[i] && isClickInShape(fieldShapes[i], mousePosition))
                     {
                         setPawnPosition(pawns[selectedPawnIdx], i / BOARD_SIZE, i % BOARD_SIZE);
-                        if (i / BOARD_SIZE - rows[selectedPawnIdx] > 1)
+                        if (i / BOARD_SIZE - rows[selectedPawnIdx] > 1 || i / BOARD_SIZE - rows[selectedPawnIdx] < -1)
                         {
-                            removePawn((rows[selectedPawnIdx] + i / BOARD_SIZE) / 2, (cols[selectedPawnIdx] + i % BOARD_SIZE) / 2,
+                            removePawn((rows[selectedPawnIdx] + i / BOARD_SIZE) / 2, (cols[selectedPawnIdx] + (i % BOARD_SIZE)) / 2,
                                 rows, cols, fields, pawns);
                         }
                         fields[rows[selectedPawnIdx] * BOARD_SIZE + cols[selectedPawnIdx]] = -1;
                         fields[i] = selectedPawnIdx;
                         rows[selectedPawnIdx] = i / BOARD_SIZE;
                         cols[selectedPawnIdx] = i % BOARD_SIZE;
+                        if ((selectedPawnIdx >= PAWN_ROWS * BOARD_SIZE / 2
+                            && rows[selectedPawnIdx] == 0) ||
+                            (selectedPawnIdx < PAWN_ROWS * BOARD_SIZE / 2 &&
+                                rows[selectedPawnIdx] == BOARD_SIZE - 1))
+                        {
+                            markQueen(pawns, selectedPawnIdx);
+                            isQueen[selectedPawnIdx] = true;   
+                        }
                         selectedPawnIdx = -1;
                         clearAvailableFields(available);
+                        blackTurn = !blackTurn;
                         isThereKill = false;
-                        for (int i = 0; i < PAWN_ROWS * BOARD_SIZE; i++)
+                        if (!blackTurn)
                         {
-                            pawnHasKill[i] = hasKill(fields, i, rows, cols);
-                            if (pawnHasKill[i])
-                                isThereKill = true;
+                            for (int i = 0; i < PAWN_ROWS * BOARD_SIZE / 2; i++)
+                            {
+                                pawnHasKill[i] = rows[i] >= 0 && hasKill(fields, i, rows, cols);
+                                if (pawnHasKill[i])
+                                    isThereKill = true;
+                            }
+                        }
+                        else
+                        {
+                            for (int i = PAWN_ROWS * BOARD_SIZE / 2; i < PAWN_ROWS * BOARD_SIZE; i++)
+                            {
+                                pawnHasKill[i] = rows[i] >= 0 && hasKill(fields, i, rows, cols);
+                                if (pawnHasKill[i])
+                                    isThereKill = true;
+                            }
                         }
                         break;
                     }
