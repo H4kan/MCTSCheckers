@@ -1,0 +1,183 @@
+﻿  Compiling CUDA source file kernel.cu...
+  
+  C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include"  -G   --keep-dir x64\Debug  -maxrregcount=0  --machine 64 --compile -cudart static  -g  -DSFML_STATIC -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /Fdx64\Debug\vc142.pdb /FS /Zi /RTC1 /MDd " -o x64\Debug\kernel.cu.obj "C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu" 
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1478): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1483): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1493): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1498): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1504): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1509): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1514): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1519): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1368): warning #20044-D: extern declaration of the entity sumRewards is treated as a static definition
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(491): warning #20011-D: calling a __host__ function("rand") from a __host__ __device__ function("getRandom") is not allowed
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(632): warning #20011-D: calling a __host__ function("trackPawnToRemove(int, int, int, int, int *)") from a __host__ __device__ function("makeRandomAvailableMove") is not allowed
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(638): warning #20011-D: calling a __host__ function("removePawn(int, int *, int *, int *)") from a __host__ __device__ function("makeRandomAvailableMove") is not allowed
+  
+CUDACOMPILE : ptxas warning : Stack size for entry function '_Z15d_runSimulationILj250EEvPiS0_S0_PbPfbibii' cannot be statically determined
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1478): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1483): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1493): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1498): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1504): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1509): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1514): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1519): warning #546-D: transfer of control bypasses initialization of:
+              variable "baseNumOfWhite"
+  (1522): here
+              variable "baseNumOfBlack"
+  (1523): here
+              variable "dev_ptr"
+  (1533): here
+              variable "sumRewards"
+  (1534): here
+  
+  kernel.cu
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1467): warning C4244: 'initializing': conversion from 'float' to 'unsigned int', possible loss of data
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1534): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=int
+          ]
+C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1538): warning C4533: initialization of 'dev_ptr' is skipped by 'goto Error'
+  C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1533): note: see declaration of 'dev_ptr'
+  C:\Users\Szymon\source\repos\checkersCUDA\checkersCUDA\kernel.cu(1538): note: see declaration of 'Error'
+  checkersCUDA.vcxproj -> C:\Users\Szymon\source\repos\checkersCUDA\x64\Debug\checkersCUDA.exe
