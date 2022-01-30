@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
+#include <chrono>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <thrust/device_ptr.h>
@@ -1675,7 +1676,7 @@ bool d_initMemory(float** d_rewards, fixedNode** d_fixed, int blockNum)
         cudaFree(d_rewards);
         return false;
     }
-   
+
     return true;
 }
 
@@ -1687,7 +1688,7 @@ void d_freeMemory(float* d_rewards, fixedNode* d_fixed)
 bool deviceMakeEvaluation(node* root, bool blackEval, int player, float* d_rewards, fixedNode* d_fixed)
 {
     int numOfEvaluations = (player == PLAYER_ONE ? NUM_OF_EVAL_ONE : NUM_OF_EVAL_TWO);
-    
+
     unsigned int blockSize = min(numOfEvaluations, 1024);
     unsigned int blockNum = ceil(numOfEvaluations / (float)blockSize);
 
@@ -1704,27 +1705,27 @@ bool deviceMakeEvaluation(node* root, bool blackEval, int player, float* d_rewar
 
 
 
-  /*  cudaStatus = cudaMemcpy(d_fields, root->fields, BOARD_SIZE * BOARD_SIZE * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        return false;
-    }
+    /*  cudaStatus = cudaMemcpy(d_fields, root->fields, BOARD_SIZE * BOARD_SIZE * sizeof(int), cudaMemcpyHostToDevice);
+      if (cudaStatus != cudaSuccess) {
+          fprintf(stderr, "cudaMemcpy failed!");
+          return false;
+      }
 
-    cudaStatus = cudaMemcpy(d_rows, root->rows, PAWN_ROWS * BOARD_SIZE * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        return false;
-    }
-    cudaStatus = cudaMemcpy(d_cols, root->cols, PAWN_ROWS * BOARD_SIZE * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        return false;
-    }
-    cudaStatus = cudaMemcpy(d_isQueen, root->isQueen, PAWN_ROWS * BOARD_SIZE * sizeof(bool), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        return false;
-    }*/
+      cudaStatus = cudaMemcpy(d_rows, root->rows, PAWN_ROWS * BOARD_SIZE * sizeof(int), cudaMemcpyHostToDevice);
+      if (cudaStatus != cudaSuccess) {
+          fprintf(stderr, "cudaMemcpy failed!");
+          return false;
+      }
+      cudaStatus = cudaMemcpy(d_cols, root->cols, PAWN_ROWS * BOARD_SIZE * sizeof(int), cudaMemcpyHostToDevice);
+      if (cudaStatus != cudaSuccess) {
+          fprintf(stderr, "cudaMemcpy failed!");
+          return false;
+      }
+      cudaStatus = cudaMemcpy(d_isQueen, root->isQueen, PAWN_ROWS * BOARD_SIZE * sizeof(bool), cudaMemcpyHostToDevice);
+      if (cudaStatus != cudaSuccess) {
+          fprintf(stderr, "cudaMemcpy failed!");
+          return false;
+      }*/
 
     int baseNumOfWhite = 0;
     int baseNumOfBlack = 0;
@@ -1734,8 +1735,10 @@ bool deviceMakeEvaluation(node* root, bool blackEval, int player, float* d_rewar
     for (int i = PAWN_ROWS * BOARD_SIZE / 2; i < PAWN_ROWS * BOARD_SIZE; i++)
         if (root->rows[i] >= 0) baseNumOfBlack++;
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     if (player == PLAYER_ONE)
-    {   
+    {
         d_runSimulation<BLOCK_SIZE_ONE> << < BLOCK_NUM_ONE_V, BLOCK_SIZE_ONE_V, MAX_BLOCK * sizeof(float) >> > (d_fixed, d_rewards, root->blackTurn, root->lastKill, blackEval, baseNumOfWhite, baseNumOfBlack);
     }
     else
@@ -1744,8 +1747,10 @@ bool deviceMakeEvaluation(node* root, bool blackEval, int player, float* d_rewar
     }
 
     cudaStatus = cudaDeviceSynchronize();
+    auto end = std::chrono::high_resolution_clock::now();
     if (cudaStatus != cudaSuccess)
     {
+        auto timee = chrono::duration_cast<chrono::milliseconds>(end - start).count();
         fprintf(stderr, "cudaDeviceSynchronize failed");
         //return false;
     }
@@ -1763,6 +1768,7 @@ bool deviceMakeEvaluation(node* root, bool blackEval, int player, float* d_rewar
     root->avgReward = sumRewards / numOfEvaluations;
     if (sumRewards == 0)
     {
+        auto timee = chrono::duration_cast<chrono::seconds>(end - start).count();
         cout << 1;
     }
     return true;
@@ -1823,7 +1829,7 @@ void makeMCTSMove(int* fields, int* rows, int* cols, bool* isQueen, bool blackTu
         return;
 
 
-    float* d_rewards = nullptr; 
+    float* d_rewards = nullptr;
     fixedNode* d_fixed;
     if (player == PLAYER_ONE && PARALLEL_PLAYER_ONE)
     {
@@ -1833,7 +1839,7 @@ void makeMCTSMove(int* fields, int* rows, int* cols, bool* isQueen, bool blackTu
     {
         d_initMemory(&d_rewards, &d_fixed, BLOCK_NUM_TWO);
     }
-        
+
 
     for (int p = 0; p < (player == PLAYER_ONE ? TREE_ITER_ONE : TREE_ITER_TWO); p++)
     {
@@ -1964,7 +1970,7 @@ int main()
         {
             if (blackTurn)
             {
-                
+
                 makeMCTSMove(fields, rows, cols, isQueen, blackTurn, PLAYER_TWO);
                 blackTurn = !blackTurn;
                 for (int i = 0; i < PAWN_ROWS * BOARD_SIZE; i++)
