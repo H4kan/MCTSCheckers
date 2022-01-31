@@ -61,7 +61,7 @@
 #define BLOCK_NUM_ONE_V dim3((NUM_OF_EVAL_ONE / (float)BLOCK_SIZE_ONE != NUM_OF_EVAL_ONE / BLOCK_SIZE_ONE ? NUM_OF_EVAL_ONE / BLOCK_SIZE_ONE + 1 : NUM_OF_EVAL_ONE / BLOCK_SIZE_ONE), 1, 1)
 #define BLOCK_NUM_TWO_V dim3((NUM_OF_EVAL_TWO / (float)BLOCK_SIZE_TWO != NUM_OF_EVAL_TWO / BLOCK_SIZE_TWO ? NUM_OF_EVAL_TWO / BLOCK_SIZE_TWO + 1 : NUM_OF_EVAL_TWO / BLOCK_SIZE_TWO), 1, 1)
 
-
+__shared__ volatile float sumRewards[MAX_BLOCK];
 
 using namespace sf;
 using namespace std;
