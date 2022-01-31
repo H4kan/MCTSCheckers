@@ -87,6 +87,7 @@ typedef struct fixedNode {
     bool isQueen[PAWN_ROWS * BOARD_SIZE];
 } fixedNode;
 
+// colors checkboard in display
 __host__ void recolorFields(RectangleShape* fields)
 {
     for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
@@ -97,6 +98,7 @@ __host__ void recolorFields(RectangleShape* fields)
     }
 }
 
+// setups checkboard data structures
 __host__ void setupFields(RectangleShape* fieldShapes, int* fields)
 {
     const Vector2f vecSize{ (float)(WINDOW_WIDTH / BOARD_SIZE), (float)(WINDOW_HEIGHT / BOARD_SIZE) };
@@ -112,6 +114,7 @@ __host__ void setupFields(RectangleShape* fieldShapes, int* fields)
     recolorFields(fieldShapes);
 }
 
+// sets pawn position in display
 __host__ void setPawnPosition(CircleShape& pawn, int row, int col)
 {
     const Vector2f vecPos{ (float)(col * WINDOW_WIDTH / BOARD_SIZE + (WINDOW_WIDTH / BOARD_SIZE - PAWN_SIZE) / 2),
@@ -119,6 +122,7 @@ __host__ void setPawnPosition(CircleShape& pawn, int row, int col)
     pawn.setPosition(vecPos);
 }
 
+// setup pawns data structures
 __host__ void setupPawns(CircleShape* pawns, int* fields, int* rows, int* cols, bool* pawnHasKill, bool* isQueen)
 {
     for (int i = 0; i < PAWN_ROWS * BOARD_SIZE; i++)
@@ -151,6 +155,7 @@ __host__ void setupPawns(CircleShape* pawns, int* fields, int* rows, int* cols, 
     }
 }
 
+// handles checkboard click event
 __host__ bool isClickInShape(Shape& shape, Vector2f clickPos)
 {
     Vector2f shapePosition = shape.getPosition();
@@ -158,6 +163,7 @@ __host__ bool isClickInShape(Shape& shape, Vector2f clickPos)
         && clickPos.y >= shapePosition.y && clickPos.y <= shapePosition.y + shape.getLocalBounds().height;
 }
 
+// clears data structure of available moves
 __host__ __device__ void clearAvailableFields(bool* available, int& numOfAvailable)
 {
     numOfAvailable = 0;
@@ -165,6 +171,7 @@ __host__ __device__ void clearAvailableFields(bool* available, int& numOfAvailab
         available[i] = false;
 }
 
+// determines is pawn in position (row, col) has queen kill
 __host__ __device__ bool hasQueenKill(int* fields, int row, int col, int idx)
 {
     int halfPawn = PAWN_ROWS * BOARD_SIZE / 2;
@@ -221,6 +228,7 @@ __host__ __device__ bool hasQueenKill(int* fields, int row, int col, int idx)
 
 }
 
+// determines is pawn in position (row, col) has pawn kill
 __host__ __device__ bool hasKill(int* fields, int idx, int* rows, int* cols, bool isChainKill = false)
 {
     int halfPawns = PAWN_ROWS * BOARD_SIZE / 2;
@@ -269,6 +277,7 @@ __host__ __device__ bool hasKill(int* fields, int idx, int* rows, int* cols, boo
     return false;
 }
 
+// sets positions that pawn can move to in available data structure
 __host__ __device__ void setAvailableFields(int row, int col, bool isWhite, bool* available, int* fields, int& numOfAvailable)
 {
     bool shouldUpdateAvailable = available != nullptr;
@@ -304,6 +313,7 @@ __host__ __device__ void setAvailableFields(int row, int col, bool isWhite, bool
     }
 }
 
+// sets positions that queen can move to in available data structure
 __host__ __device__ void setAvailableQueenFields(int row, int col, bool* available, int* fields, int& numOfAvailable)
 {
     bool shouldUpdateAvailable = available != nullptr;
@@ -341,6 +351,7 @@ __host__ __device__ void setAvailableQueenFields(int row, int col, bool* availab
     }
 }
 
+// sets positions that pawn can kill to in available data structure
 __host__ __device__ void setAvailableKills(int* fields, int row, int col, int idx, bool isWhite, bool* available, int& numOfAvailable)
 {
     int halfPawn = PAWN_ROWS * BOARD_SIZE / 2;
@@ -385,6 +396,7 @@ __host__ __device__ void setAvailableKills(int* fields, int row, int col, int id
     }
 }
 
+// sets positions that queen can kill to in available data structure
 __host__ __device__ void setAvailableQueenKills(int* fields, int row, int col, int idx, bool* available, int& numOfAvailable)
 {
     int halfPawn = PAWN_ROWS * BOARD_SIZE / 2;
@@ -443,6 +455,7 @@ __host__ __device__ void setAvailableQueenKills(int* fields, int row, int col, i
     }
 }
 
+// marks fields from available data structure in display
 __host__ void markAvailableFields(RectangleShape* fieldShapes, bool* available)
 {
     for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
@@ -452,6 +465,7 @@ __host__ void markAvailableFields(RectangleShape* fieldShapes, bool* available)
     }
 }
 
+// removes pawn from data structures
 __host__ __device__ void removePawn(int idx, int* rows, int* cols, int* fields)
 {
     int targetIdx = fields[idx];
@@ -460,6 +474,7 @@ __host__ __device__ void removePawn(int idx, int* rows, int* cols, int* fields)
     fields[idx] = -1;
 }
 
+// handles clicking on pawn, it will cause available moves to be displayed
 __host__ void handlePawnClick(int i, int* rows, int* cols, int* fields, RectangleShape* fieldShapes, bool* available, int& numOfAvailable,
     int& selectedPawnIdx, bool& performedOperation, bool isThereKill, bool* pawnHasKill, bool* isQueen, bool isChainKill = false)
 {
@@ -497,11 +512,13 @@ __host__ void handlePawnClick(int i, int* rows, int* cols, int* fields, Rectangl
     performedOperation = true;
 }
 
+// changes pawn to queen in display
 __host__ void markQueen(CircleShape* pawns, int idx)
 {
     pawns[idx].setOutlineColor(Color::Yellow);
 }
 
+// finds pawn that needs to be removed after move
 __host__ __device__ int trackPawnToRemove(int rowStart, int colStart, int rowEnd, int colEnd, int* fields)
 {
     int diffR = rowEnd - rowStart > 0 ? 1 : -1;
@@ -514,18 +531,19 @@ __host__ __device__ int trackPawnToRemove(int rowStart, int colStart, int rowEnd
     return -1;
 }
 
-// from [start, end)
+// random number from [start, end)
 __host__ int h_getRandom(int start, int end)
 {
     return rand() % (end - start) + start;
 }
 
-// from [start, end)
+// random number from [start, end)
 __device__ int d_getRandom(int start, int end, curandState* state)
 {
     return end - ceilf(curand_uniform(state) * (end - start));
 }
 
+// performs random available move in data structures
 __host__ bool h_makeRandomAvailableMove(int* fields, int* rows, int* cols, bool* pawnHasKill, bool* isQueen, bool& blackTurn, bool* available, int& numOfWhite, int& numOfBlack, int pawnInChainKill = -1)
 {
     bool isThereKill = false;
@@ -695,6 +713,7 @@ __host__ bool h_makeRandomAvailableMove(int* fields, int* rows, int* cols, bool*
     return numOfWhite > 0 && numOfBlack > 0;
 }
 
+// performs random available move in data structures
 __device__ bool d_makeRandomAvailableMove(int* fields, int* rows, int* cols, bool* pawnHasKill, bool* isQueen, bool& blackTurn, bool* available, int& numOfWhite, int& numOfBlack, curandState* state, int pawnInChainKill = -1)
 {
     bool isThereKill = false;
@@ -865,6 +884,7 @@ __device__ bool d_makeRandomAvailableMove(int* fields, int* rows, int* cols, boo
     return numOfWhite > 0 && numOfBlack > 0;
 }
 
+// inits node in MCTS tree holding game state
 __host__ node* initNode(int* fields, int* rows, int* cols, bool* isQueen, bool blackTurn)
 {
     node* state = new node;
@@ -886,6 +906,7 @@ __host__ node* initNode(int* fields, int* rows, int* cols, bool* isQueen, bool b
     return state;
 }
 
+// expands MCTS tree for possible pawn kills
 __host__ void expandForPawnKills(int* fields, int row, int col, int idx, bool isWhite, node* root, bool changeTurn = true)
 {
     int halfPawn = PAWN_ROWS * BOARD_SIZE / 2;
@@ -1051,6 +1072,7 @@ __host__ void expandForPawnKills(int* fields, int row, int col, int idx, bool is
     }
 }
 
+// expands MCTS tree for possible queen kills
 __host__ void expandForQueenKill(int* fields, int row, int col, int idx, node* root, bool changeTurn = true)
 {
     int halfPawn = PAWN_ROWS * BOARD_SIZE / 2;
@@ -1193,6 +1215,7 @@ __host__ void expandForQueenKill(int* fields, int row, int col, int idx, node* r
     }
 }
 
+// expands MCTS tree for possible pawn moves
 __host__ void expandForPawnMoves(int row, int col, int idx, int* fields, node* root)
 {
     if (!(root->blackTurn) && row < BOARD_SIZE - 1)
@@ -1297,6 +1320,7 @@ __host__ void expandForPawnMoves(int row, int col, int idx, int* fields, node* r
     }
 }
 
+// expands MCTS tree for possible queen moves
 __host__ void expandForQueenMoves(int row, int col, int idx, int* fields, node* root)
 {
     for (int r = row - 1, c = col - 1; r >= 0 && c >= 0; r--, c--)
@@ -1397,6 +1421,7 @@ __host__ void expandForQueenMoves(int row, int col, int idx, int* fields, node* 
     }
 }
 
+// expands MCTS tree
 __host__ void expandNode(node* root)
 {
     if (root->lastKill >= 0)
@@ -1454,12 +1479,14 @@ __host__ void expandNode(node* root)
     }
 }
 
+// calculate upper confidence boundary value of node
 __host__ float getUCBValue(node* parent, node* child)
 {
     if (child->howManyVisits == 0) return INFINITY;
     return (float)(child->avgReward + 2 * sqrt(log(parent->howManyVisits) / (float)child->howManyVisits));
 }
 
+// frees memory allocated to node
 __host__ void freeNode(node* root)
 {
     delete[] root->fields;
@@ -1475,6 +1502,7 @@ __host__ void freeNode(node* root)
     delete root;
 }
 
+// evaluates current position of player on checkboard
 // inspired by wischk checkers program evalutaion function
 // http://people.cs.uchicago.edu/~wiseman/checkers/
 __host__ __device__ float evaluatePositionValue(int* rows, int* cols, bool* isQueen, bool blackEval)
@@ -1561,6 +1589,7 @@ __host__ __device__ float evaluatePositionValue(int* rows, int* cols, bool* isQu
     return tscore * (blackEval ? 1 : -1);
 }
 
+// sum reduce
 template <unsigned int blockSize>
 __device__ void warpReduce(volatile float* sdata, unsigned int tid) {
     if (blockSize >= 64) sdata[tid] += sdata[tid + 32];
@@ -1571,6 +1600,7 @@ __device__ void warpReduce(volatile float* sdata, unsigned int tid) {
     if (blockSize >= 2) sdata[tid] += sdata[tid + 1];
 }
 
+// performs copying node from dynamic memory node to static one
 void copyToFixedNode(node* root, fixedNode* fixed)
 {
     for (int i = 0; i < PAWN_ROWS * BOARD_SIZE; i++)
@@ -1585,6 +1615,7 @@ void copyToFixedNode(node* root, fixedNode* fixed)
     }
 }
 
+// performs sequential random moves and evaluates position afterwards
 template <unsigned int blockSize>
 __global__ void d_runSimulation(fixedNode* root, float* rewards, bool blackTurn, int lastKill, bool blackEval, int g_numOfWhite, int g_numOfBlack)
 {
@@ -1594,33 +1625,6 @@ __global__ void d_runSimulation(fixedNode* root, float* rewards, bool blackTurn,
     int rows[PAWN_ROWS * BOARD_SIZE];
     int cols[PAWN_ROWS * BOARD_SIZE];
     bool isQueen[PAWN_ROWS * BOARD_SIZE];
-    //int* fields = (int*)malloc( * sizeof(int));
-    //if (fields == nullptr)
-    //{
-    //    return;
-    //}
- /*   int* rows = (int*)malloc(PAWN_ROWS * BOARD_SIZE * sizeof(int));
-    if (rows == nullptr)
-    {
-        free(fields);
-        return;
-    }
-    int* cols = (int*)malloc(PAWN_ROWS * BOARD_SIZE * sizeof(int));
-    if (cols == nullptr)
-    {
-        free(fields);
-        free(rows);
-        return;
-    }
-    bool* isQueen = (bool*)malloc(PAWN_ROWS * BOARD_SIZE * sizeof(bool));
-    if (isQueen == nullptr)
-    {
-        free(fields);
-        free(rows);
-        free(cols);
-        return;
-    }*/
-
 
     curandState state;
 
@@ -1663,6 +1667,7 @@ __global__ void d_runSimulation(fixedNode* root, float* rewards, bool blackTurn,
 
 }
 
+// inits memory for gpu purposes
 bool d_initMemory(float** d_rewards, fixedNode** d_fixed, int blockNum)
 {
     cudaError_t cudaStatus;
@@ -1682,12 +1687,14 @@ bool d_initMemory(float** d_rewards, fixedNode** d_fixed, int blockNum)
     return true;
 }
 
+// frees memory for gpu purposes
 void d_freeMemory(float* d_rewards, fixedNode* d_fixed)
 {
     cudaFree(d_rewards);
     cudaFree(d_fixed);
 }
 
+// evaluates position value by running multiple simulations
 bool deviceMakeEvaluation(node* root, bool blackEval, int player, float* d_rewards, fixedNode* d_fixed, std::chrono::nanoseconds* timeStamps)
 {
     int numOfEvaluations = (player == PLAYER_ONE ? NUM_OF_EVAL_ONE : NUM_OF_EVAL_TWO);
@@ -1757,6 +1764,7 @@ bool deviceMakeEvaluation(node* root, bool blackEval, int player, float* d_rewar
     return true;
 }
 
+// evaluates position value by running multiple simulations
 void hostMakeEvaluation(node* root, bool blackEval, int player, std::chrono::nanoseconds* timeStamps)
 {
     auto cpuStart = std::chrono::high_resolution_clock::now();
@@ -1804,6 +1812,7 @@ void hostMakeEvaluation(node* root, bool blackEval, int player, std::chrono::nan
     timeStamps[2] += cpuEnd - cpuStart;
 }
 
+// finds best move with MCTS tree and performs it on data structures
 bool makeMCTSMove(int* fields, int* rows, int* cols, bool* isQueen, bool blackTurn, int player, std::chrono::nanoseconds* timeStamps)
 {
     node* root = initNode(fields, rows, cols, isQueen, blackTurn);
@@ -1922,6 +1931,7 @@ bool makeMCTSMove(int* fields, int* rows, int* cols, bool* isQueen, bool blackTu
     return true;
 }
 
+// prints logs to file
 void printOutTimes(std::chrono::nanoseconds* timeStamps, int blackTurn)
 {
     string outputFile = "output.txt";
